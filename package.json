@@ -1,0 +1,25 @@
+{
+  "name": "bangumi-tagpilot",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Safe local rule-based tag suggestion assistant for Bangumi collection tagging.",
+  "type": "module",
+  "scripts": {
+    "dev": "node --check src/main.js",
+    "build": "node scripts/build.mjs",
+    "lint": "node --check src/main.js",
+    "test": "vitest --run"
+  },
+  "keywords": [
+    "bangumi",
+    "userscript",
+    "superalloy",
+    "tags"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "jsdom": "^26.0.0",
+    "vitest": "^3.0.0"
+  }
+}
