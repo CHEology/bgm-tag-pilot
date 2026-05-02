@@ -2,7 +2,7 @@ import { SELECTORS } from './selectors.js';
 import { isSafeSingleTokenTag, normalizeTag, uniqueTags } from '../utils/tags.js';
 
 export function detectSubjectPage(root) {
-  return isSubjectPath(window.location.pathname) && Boolean(root.querySelector(SELECTORS.subject.title));
+  return isSubjectPath(window.location.pathname);
 }
 
 export function isSubjectPath(pathname) {

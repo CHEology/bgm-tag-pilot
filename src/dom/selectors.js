@@ -3,10 +3,16 @@
 // but exact editable tag selectors may vary by page state and login state.
 export const SELECTORS = {
   subject: {
-    title: 'h1.nameSingle a, h1.nameSingle',
+    title: 'h1.nameSingle a, h1.nameSingle, h1, [data-subject-title]',
     infoBox: '#infobox, .infobox',
     root: '#subject_detail, #columnSubjectHomeA, #columnSubjectBrowserA, body',
     publicTags: [
+      'a[href*="/anime/tag/"]',
+      'a[href*="/book/tag/"]',
+      'a[href*="/music/tag/"]',
+      'a[href*="/game/tag/"]',
+      'a[href*="/real/tag/"]',
+      'a[href*="/tag/"]',
       '#subject_detail a[href*="/tag/"]',
       '#subject_detail a[href*="/anime/tag/"]',
       '#subject_detail a[href*="/book/tag/"]',
@@ -18,9 +24,18 @@ export const SELECTORS = {
     typeFromBodyClass: 'body',
   },
   collectionEditor: {
-    tagInput: 'input[name="tags"], input#tags, textarea[name="tags"]',
-    editorRoot: '#collectBox, #subjectPanelCollect, .collectModify, .collectBlock, form',
-    observerRoot: '#collectBox, #subjectPanelCollect, #columnSubjectHomeB, #columnSubjectBrowserB, #subject_detail',
-    fallbackMount: '#columnSubjectHomeB, #columnSubjectBrowserB, #subject_detail',
+    explicitTagInput: 'input[name="tags"], input#tags, textarea[name="tags"]',
+    tagInput: [
+      'input[name="tags"]',
+      'input#tags',
+      'textarea[name="tags"]',
+      'input[placeholder*="标签"]',
+      'input[aria-label*="标签"]',
+      'input[type="text"]',
+      'input:not([type])',
+    ].join(', '),
+    editorRoot: '#collectBox, #subjectPanelCollect, .collectModify, .collectBlock, [role="dialog"], form',
+    observerRoot: 'body, [role="dialog"], #collectBox, #subjectPanelCollect, #columnSubjectHomeB, #columnSubjectBrowserB, #subject_detail',
+    fallbackMount: '#columnSubjectHomeB, #columnSubjectBrowserB, #subject_detail, [role="dialog"]',
   },
 };

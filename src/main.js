@@ -20,12 +20,16 @@ export function isLikelyBangumiHost(hostname) {
 }
 
 export function initializeTagPilot(root = document) {
+  setDebugStatus('starting');
+
   if (!isLikelyBangumiHost(window.location.hostname)) {
+    setDebugStatus('skipped-host');
     logger.debug('Skipping initialization outside Bangumi host.');
     return { mounted: false, observing: false };
   }
 
   if (!isSubjectPath(window.location.pathname) || !detectSubjectPage(root)) {
+    setDebugStatus('skipped-path');
     logger.debug('Skipping initialization outside Bangumi subject page.');
     return { mounted: false, observing: false };
   }
@@ -33,15 +37,18 @@ export function initializeTagPilot(root = document) {
   const mountState = createMountState(root);
 
   if (tryMountTagPilot(mountState)) {
+    setDebugStatus('mounted');
     return { mounted: mountState.mounted, observing: false };
   }
 
   const observer = observeCollectionEditor(root, () => {
     if (tryMountTagPilot(mountState)) {
+      setDebugStatus('mounted');
       observer.disconnect();
     }
   });
 
+  setDebugStatus(observer ? 'observing' : 'observer-unavailable');
   return { mounted: mountState.mounted, observing: Boolean(observer), observer };
 }
 
@@ -87,6 +94,12 @@ function tryMountTagPilot(state) {
   return true;
 }
 
+function setDebugStatus(status) {
+  if (typeof window !== 'undefined') {
+    window.__TAGPILOT_STATUS__ = status;
+  }
+}
+
 function observeCollectionEditor(root, onEditorReady) {
   if (typeof window.MutationObserver !== 'function') {
     logger.debug('MutationObserver is not available.');
@@ -127,5 +140,6 @@ if (
   && typeof document !== 'undefined'
   && !window.__TAGPILOT_DISABLE_AUTO_START__
 ) {
+  window.__TAGPILOT_RETRY__ = () => initializeTagPilot(document);
   autoStart();
 }

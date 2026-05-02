@@ -40,6 +40,10 @@ export function injectStyles(root = document) {
 .tagpilot-suggestion small {
   color: #888;
 }
+.tagpilot-empty {
+  margin: 0;
+  color: #888;
+}
 .tagpilot-panel button {
   border: 1px solid #aaa;
   border-radius: 4px;

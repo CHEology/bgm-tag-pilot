@@ -1,5 +1,5 @@
 export function createTagPanel({ mount, suggestions, onInsert }) {
-  if (!mount || !Array.isArray(suggestions) || suggestions.length === 0) {
+  if (!mount || !Array.isArray(suggestions)) {
     return null;
   }
 
@@ -35,6 +35,13 @@ export function createTagPanel({ mount, suggestions, onInsert }) {
 
     label.append(checkbox, text, reason);
     list.append(label);
+  }
+
+  if (suggestions.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'tagpilot-empty';
+    empty.textContent = '暂无可插入的单词标签建议';
+    list.append(empty);
   }
 
   const insertButton = document.createElement('button');

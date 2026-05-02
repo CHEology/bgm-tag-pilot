@@ -9,7 +9,7 @@ export function detectCollectionEditor(root) {
 export function readCollectionEditor(root) {
   const tagInput = findVisibleTagInput(root);
   const editorRoot = tagInput?.closest(SELECTORS.collectionEditor.editorRoot) ?? null;
-  const panelMount = editorRoot ?? root.querySelector(SELECTORS.collectionEditor.fallbackMount);
+  const panelMount = tagInput ? findOrCreatePanelMount(tagInput) : editorRoot ?? root.querySelector(SELECTORS.collectionEditor.fallbackMount);
 
   return {
     tagInput,
@@ -21,13 +21,14 @@ export function readCollectionEditor(root) {
 
 export function findVisibleTagInput(root) {
   return Array.from(root.querySelectorAll(SELECTORS.collectionEditor.tagInput))
-    .find((input) => isElementVisible(input) && !input.disabled && input.getAttribute('type') !== 'hidden') ?? null;
+    .find((input) => isVisibleEditableInput(input) && isLikelyTagInput(input)) ?? null;
 }
 
 export function findEditorObserverRoot(root) {
-  return queryFirstByPriority(root, SELECTORS.collectionEditor.observerRoot)
+  return root.body
+    ?? queryFirstByPriority(root, SELECTORS.collectionEditor.observerRoot)
     ?? queryFirstByPriority(root, SELECTORS.subject.root)
-    ?? root.body;
+    ?? null;
 }
 
 export function insertTagsIntoEditor(editor, tagsToInsert) {
@@ -48,4 +49,47 @@ function queryFirstByPriority(root, selectors) {
     .split(',')
     .map((selector) => root.querySelector(selector.trim()))
     .find(Boolean) ?? null;
+}
+
+function findOrCreatePanelMount(tagInput) {
+  const existing = Array.from(tagInput.parentElement?.children ?? [])
+    .find((child) => child.classList.contains('tagpilot-mount'));
+  if (existing) {
+    return existing;
+  }
+
+  const mount = document.createElement('div');
+  mount.className = 'tagpilot-mount';
+  tagInput.insertAdjacentElement('afterend', mount);
+  return mount;
+}
+
+function isVisibleEditableInput(input) {
+  return isElementVisible(input)
+    && !input.disabled
+    && input.getAttribute('type') !== 'hidden'
+    && input.getAttribute('type') !== 'search';
+}
+
+function isLikelyTagInput(input) {
+  if (input.matches(SELECTORS.collectionEditor.explicitTagInput)) {
+    return true;
+  }
+
+  const accessibleText = [
+    input.getAttribute('name'),
+    input.id,
+    input.getAttribute('placeholder'),
+    input.getAttribute('aria-label'),
+  ].filter(Boolean).join(' ');
+
+  if (/tag|标签/i.test(accessibleText)) {
+    return true;
+  }
+
+  const context = input.closest(SELECTORS.collectionEditor.editorRoot) ?? input.parentElement;
+  const contextText = (context?.textContent ?? '').replace(/\s+/g, ' ');
+
+  return /标签/.test(contextText)
+    && (/常用标签|我的标签|使用半角空格|逗号隔开|至多10个/.test(contextText));
 }
